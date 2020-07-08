@@ -1,0 +1,172 @@
+{% extends "book_store/basic.html" %}
+
+{% block title %} Details {% endblock %}
+
+
+
+{% block content%}
+
+
+
+
+
+
+<div style="margin-top:8%" class="container">
+
+
+    <div> <a href="{% url 'books:create-review' book.ID%}"> Comment this book </a> </div>
+
+
+    <div class="card mb-3" style="max-width: 540px;">
+        <div class="row g-0">
+            <div class="col-md-4">
+                <img style="width:250px" src=" {{book.cover.url}}">
+            </div>
+            <div class="col-md-8 text-right">
+                <div class="card-body">
+                    <h5 class="card-title">{{book.title}}</h5>
+
+                    {% for poster in book.original_poster.all%}
+
+
+                    <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
+                    </a>
+
+                    {% endfor %}
+
+
+                    {% if book.is_free %}
+                    <p class=" card-text text-success"> Free </p>
+                    {% else %}
+
+                    <p class="card-text text=primary">{{book.price}} € </p>
+                    {% endif %}
+                    <a href="{{book.pdf.url}}" class="btn btn-primary" target="_blank"> Download this book</a>
+                    {% if user in book.original_poster.all or user.is_admin %}
+
+                    {%if book.is_free %}
+
+                    <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
+                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+
+                    {%else%}
+
+                    <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
+                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+
+                    {%endif%}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+{% if book_reviews%}
+
+
+
+
+{% for review in book_reviews%}
+
+
+
+<h3>{{review.title}} </h3>
+
+{%if user == review.poster or user.is_admin%}
+
+<div> <a href="{% url 'books:update-review' review.id%}"> Update </a> </div>
+<div> <a href="{% url 'books:delete-review' review.id%}"> Delete </a> </div>
+
+
+{% endif %}
+
+<div>{{review.commentary}}</div>
+<div>{{review.poster}}</div>
+<div>{{review.date|date:"SHORT_DATE_FORMAT"}}</div>
+
+
+{%endfor%}
+
+
+{%endif%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% if same_author %}
+<p class="font-weight-bold text-center text-primary">from the same author </p>
+<div class="row">
+    {% for book in same_author %}
+    <div class="col-2 ">
+        <div class=" card my-2" style="width:180px">
+            <a href="{% url 'books:detail-books' book.ID%}">
+
+                <img style="width:180px;height:300px" src="{{book.cover.url}}" class="mx-auto" alt="">
+                <div class="card-body">
+                    <h5 class="card-title">{{book.title}}</h5>
+
+                    {% for poster in book.original_poster.all%}
+
+
+                    <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}</a>
+
+                    {% endfor %}
+
+
+
+
+
+                    <p class="card-text">Genre : {{book.get_genre_display}} <br> Posted :
+                        {{book.pub_date|date:"SHORT_DATE_FORMAT"}}
+                    </p>
+
+                    {% if book.is_free %}
+                    <a href="#" style="background:#00c972" class="btn text-light">
+
+                        Free </a>
+                    {% else %}
+
+                    <a href="#" class="btn btn-primary">
+
+                        {{book.price}} € </a>
+                    {% endif %}
+                    {% if user in book.original_poster.all or user.is_admin %}
+
+                    {%if book.is_free %}
+
+                    <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
+                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+
+                    {%else%}
+
+                    <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
+                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+
+                    {%endif%}
+                    {% endif %}
+
+
+                </div>
+            </a>
+        </div>
+
+    </div>
+    {%endfor%}
+</div>
+{% endif %}
+
+
+{%endblock content%}

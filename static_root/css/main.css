@@ -1,0 +1,12 @@
+
+html{
+    height:100%
+}
+body{       
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image : url("/static/images/book_opacity.png");
+    
+}
+

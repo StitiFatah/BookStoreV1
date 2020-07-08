@@ -1,0 +1,19 @@
+{% extends "book_store/basic.html"%}
+
+
+
+{% block title%} Bye {%endblock%}
+
+
+{% block content %}
+
+
+<p class="mb-4 alert-info p-2 rounded">You have been logged out, Hope to see you again ! </p>
+<div class="border-top pt-3">
+    <small class="text-muted"> <a class="ml-2" href="{% url 'login' %}"> Log In Again ?</a>
+    </small>
+
+</div>
+
+
+{% endblock content%}

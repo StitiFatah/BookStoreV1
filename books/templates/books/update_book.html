@@ -1,0 +1,38 @@
+{% extends 'book_store/basic.html' %}
+
+
+
+
+{% block content%}
+
+
+<div style="margin:8%" class="">
+
+
+    <form action="" method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {{form.as_p}}
+
+        <input type="submit" name="" id="">
+
+    </form>
+
+    {% if book.is_free %}
+
+    <a href="{% url 'books:update-non-free-view' book.ID %}"> Switch to Paid Book</a>
+
+    {%else %}
+
+    <a href="{% url 'books:update-view' book.ID %}"> Switch to Free Book</a>
+
+    {%endif%}
+
+</div>
+
+
+
+
+
+{%endblock %}

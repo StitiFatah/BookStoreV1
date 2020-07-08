@@ -1,0 +1,25 @@
+{% extends 'book_store/basic.html' %}
+
+
+
+
+{% block content%}
+
+
+<div style="margin:8%" class="">
+
+
+    <form action="" method="POST">
+
+        {% csrf_token %}
+
+        {{form.as_p}}
+        <p> Are you sure you want to remove this book from your products ?</p>
+
+        <a class="btn btn-secondary" href="{% url 'home'%}">No Go back</a>
+        <button class="btn btn-danger " type="submit "> Yes </button>
+
+    </form>
+</div>
+
+{%endblock %}

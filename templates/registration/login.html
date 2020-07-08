@@ -1,0 +1,67 @@
+{% extends "book_store/basic.html"%}
+
+
+{% block title%} Login {%endblock%}
+
+
+{% block content %}
+
+
+
+<div class="d-flex flex-row justify-content-center">
+    <div class="shadow p-3 mb-3 test d-flex flex-column align-items-center   ">
+
+        <div style="font-size:25px;color:#389DE3" class="mb-2">Log In</div>
+        <hr class="m-0 mb-3">
+
+        <form method="POST">
+
+            {% csrf_token %}
+            <div class="form-group font">
+
+
+                <div class="border-bottom mb-4 font ">
+
+
+                    <table>
+                        <tr>
+                            <td class="text-center">{{ form.username.label_tag }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.username }}</td>
+                        </tr>
+                        <tr class="mt-4">
+                            <td class="text-center">{{ form.password.label_tag }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ form.password }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <small> <a class="m-0" href="{% url 'password_reset' %}"> Forgot your password ? </a> </small>
+
+            </div>
+
+
+
+
+            <div class="form-group d-flex flex-row justify-content-center">
+
+                <button type="submit" class="btn btn-outline-primary "> Login </button>
+
+            </div>
+        </form>
+
+        <div class="border-top pt-3">
+            <small class="text-muted"> Don't already have an account <a class="ml-2" href="{% url 'users:register' %}">
+                    Sign
+                    Up
+                    Now</a> </small>
+
+        </div>
+
+
+    </div>
+
+</div>
+{%endblock content%}

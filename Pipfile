@@ -17,6 +17,8 @@ django-allauth = "*"
 pillow = "*"
 pipfile = "*"
 lorem-text = "*"
+django-countries = "*"
+django-crispy-forms = "*"
 
 [requires]
 python_version = "3.8"

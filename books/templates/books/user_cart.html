@@ -1,0 +1,73 @@
+{% extends 'book_store/basic.html' %}
+
+
+
+
+{% block content%}
+
+<div style="margin:8%" class="">
+
+    {% if messages %}
+
+    {% for message in messages %}
+    <div{% if message.tags %} class="alert-info p-1" {% endif %}>{{ message }} <a href="{%url 'books:user-cart'%}"><i
+                class="fas fa-shopping-cart"></i>
+
+        </a></div>
+{% endfor %}
+</ul>
+{% endif %}
+
+{%if user_cart %}
+
+
+<a class="btn btn-outline-danger mb-2" href="{%url 'books:empty-cart'%}">empty cart</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Item</th>
+            <th scope="col">Price</th>
+        </tr>
+    </thead>
+
+
+    <tbody>
+        {% for items in user_cart%}
+        <tr>
+            <td> <img style="width:150px;height:150px" src="{{items.item.cover.url}}" alt=""> {{items.item.title}}
+                <a href="{% url 'books:remove-from-cart' items.item.ID%}"><i class="far fa-trash-alt text-danger"></i>
+
+                </a>
+            </td>
+            <td>{{items.item.price}}</td>
+        </tr>
+        {%endfor%}
+        <tr>
+
+            <td class="font-weight-bold">Total Price</td>
+            <td class="font-weight-bold">{{total_price}}</td>
+        </tr>
+
+    </tbody>
+</table>
+
+<div> </div><a href="{% url 'books:create-order' %}" class="btn btn-primary">Continue</a> </div>
+
+
+{%else%}
+
+<div> Your cart is empty </div>
+
+
+
+</div>
+
+
+
+{%endif%}
+
+
+
+
+{%endblock %}

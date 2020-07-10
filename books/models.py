@@ -4,6 +4,7 @@ from users.models import PersoUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 from django.utils import timezone
+from django_countries.fields import CountryField
 
 
 class Books(models.Model):
@@ -223,3 +224,45 @@ class Reviews(models.Model):
 
     def __str__(self):
         return f"{self.poster} | {self.book} | {self.title}"
+
+
+class OrderItem(models.Model):
+    user = models.ForeignKey(PersoUser, to_field="ID",
+                             on_delete=models.CASCADE)
+    item = models.ForeignKey(Books, to_field="ID", on_delete=models.CASCADE)
+    ordered = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.item.title
+
+
+class BillingAddress(models.Model):
+    user = models.ForeignKey(PersoUser, to_field="ID",
+                             on_delete=models.CASCADE)
+    street_address = models.CharField(max_length=200)
+    appartment_address = models.CharField(max_length=200)
+    country = CountryField(multiple=True)
+    zip = models.CharField(max_length=20)
+    auto_complete = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username
+
+
+class Order(models.Model):
+    user = models.ForeignKey(PersoUser, to_field="ID",
+                             on_delete=models.CASCADE)
+    items = models.ManyToManyField(OrderItem)
+    billing_address = models.ForeignKey(
+        BillingAddress, on_delete=models.SET_NULL, blank=True, null=True)
+    ordered = models.BooleanField(default=False)
+    order_date = models.DateTimeField()
+
+    def __str__(self):
+        return self.user.username
+
+    def get_total(self):
+        total = 0
+        for ordered_items in self.items.all():
+            total += ordered_items.item.price
+        return total

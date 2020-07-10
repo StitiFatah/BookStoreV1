@@ -3,6 +3,7 @@ from .models import Books, Reviews
 from django.urls import reverse
 from users.models import PersoUser
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django_countries.fields import CountryField
 
 
 class CreateFreeForm(forms.ModelForm):
@@ -62,3 +63,22 @@ class ReviewForm(forms.ModelForm):
 
         model = Reviews
         fields = ["title", "commentary"]
+
+
+class CheckoutForm(forms.Form):
+    PAYPAL = "P"
+    STRIPE = "S"
+
+    PAYMENTS = [
+        (PAYPAL, "Paypal"),
+        (STRIPE, "Stripe")
+    ]
+
+    street_address = forms.CharField(required=True)
+    appartment_address = forms.CharField(required=True)
+    country = CountryField(blank_label='(select country)').formfield()
+    zip = forms.CharField(required=True)
+    remember = forms.BooleanField(
+        label="Rememeber my infos ", widget=forms.CheckboxInput(), required=False)
+    payment_options = forms.ChoiceField(
+        widget=forms.RadioSelect(), choices=PAYMENTS, required=True)

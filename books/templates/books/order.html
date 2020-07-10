@@ -1,0 +1,73 @@
+{% extends 'book_store/basic.html' %}
+
+
+
+
+{% block content%}
+
+<div style="margin:8%" class="">
+
+    {% if messages %}
+
+    {% for message in messages %}
+    <div{% if message.tags %} class="alert-info p-1" {% endif %}>{{ message }} <a href="{%url 'books:user-cart'%}"><i
+                class="fas fa-shopping-cart"></i>
+
+        </a></div>
+{% endfor %}
+</ul>
+{% endif %}
+
+{%if new_order %}
+
+
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Item</th>
+            <th scope="col">Price</th>
+        </tr>
+    </thead>
+
+
+    <tbody>
+        {% for product in new_order.items.all %}
+        <tr>
+            <td> <img style="width:150px;height:150px" src="{{items.item.cover.url}}" alt=""> {{product.item.title}}
+
+
+                </a>
+            </td>
+            <td>{{product.item.price}}</td>
+        </tr>
+        {%endfor%}
+        <tr>
+
+            <td class="font-weight-bold">Total Price</td>
+            <td class="font-weight-bold"> {{new_order.get_total}} </td>
+        </tr>
+
+    </tbody>
+</table>
+
+<div> </div><a href="#" class="btn btn-primary">Continue</a> </div>
+
+
+{%else%}
+
+<div> Your cart is empty </div>
+
+
+
+</div>
+
+
+
+{%endif%}
+
+
+
+
+{%endblock %}

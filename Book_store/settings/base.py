@@ -34,8 +34,11 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     'core',
     # Third party apps
+    'django_countries',
+    'crispy_forms',
     # 'allauth',
     # 'allauth.account',
+
 
 
     # default
@@ -152,6 +155,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("GMAIL_U")
 EMAIL_HOST_PASSWORD = os.environ.get("GMAIL_P")
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 
 # django allauth config

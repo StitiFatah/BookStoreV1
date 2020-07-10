@@ -13,53 +13,69 @@
 
 <div style="margin-top:8%" class="container">
 
+    {% if messages %}
 
-    <div> <a href="{% url 'books:create-review' book.ID%}"> Comment this book </a> </div>
+    {% for message in messages %}
+    <div{% if message.tags %} class="alert-info p-1" {% endif %}>{{ message }} <a href="{%url 'books:user-cart'%}"><i
+                class="fas fa-shopping-cart"></i>
 
+        </a></div>
+{% endfor %}
+</ul>
+{% endif %}
 
-    <div class="card mb-3" style="max-width: 540px;">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img style="width:250px" src=" {{book.cover.url}}">
-            </div>
-            <div class="col-md-8 text-right">
-                <div class="card-body">
-                    <h5 class="card-title">{{book.title}}</h5>
-
-                    {% for poster in book.original_poster.all%}
+<div> <a href=" {% url 'books:create-review' book.ID%}"> Comment this book </a> </div>
 
 
-                    <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
-                    </a>
+<div class="card mb-3" style="max-width: 540px;">
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img style="width:250px" src=" {{book.cover.url}}">
+        </div>
+        <div class="col-md-8 text-right">
+            <div class="card-body">
+                <h5 class="card-title">{{book.title}}</h5>
 
-                    {% endfor %}
+                {% for poster in book.original_poster.all%}
 
 
-                    {% if book.is_free %}
-                    <p class=" card-text text-success"> Free </p>
-                    {% else %}
+                <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
+                </a>
 
-                    <p class="card-text text=primary">{{book.price}} € </p>
-                    {% endif %}
-                    <a href="{{book.pdf.url}}" class="btn btn-primary" target="_blank"> Download this book</a>
-                    {% if user in book.original_poster.all or user.is_admin %}
+                {% endfor %}
 
-                    {%if book.is_free %}
 
-                    <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
-                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                    {%else%}
-
-                    <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
-                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                    {%endif%}
-                    {% endif %}
+                {% if book.is_free %}
+                <p class=" card-text text-success"> Free </p>
+                <div><a href="{{book.pdf.url}}" class="btn btn-primary" target="_blank"> Download this book</a>
                 </div>
+                {% else %}
+
+                <p class="card-text text=primary">{{book.price}} € </p>
+                <div><a class="btn btn-secondary mt-1" href="{% url 'books:add-to-cart' book.ID%}"> Add book to cart
+                    </a>
+                </div>
+                {% endif %}
+
+
+                {% if user in book.original_poster.all or user.is_admin %}
+
+                {%if book.is_free %}
+
+                <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
+                <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+
+                {%else%}
+
+                <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
+                <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+
+                {%endif%}
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
 
 </div>
 

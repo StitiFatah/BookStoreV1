@@ -2,9 +2,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.views import generic
-from .models import Books, Reviews
+from .models import (Books, Reviews,
+                     OrderItem, BillingAddress, Order)
 from django.utils import timezone
-from .forms import CreateFreeForm, CreateNonFreeForm, UpdateFreeForm, UpdateNonFreeForm, ReviewForm
+from .forms import (CreateFreeForm, CreateNonFreeForm,
+                    UpdateFreeForm, UpdateNonFreeForm,
+                    ReviewForm, CheckoutForm)
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
@@ -94,7 +97,8 @@ def DetailBook(request, book_id):
     book_reviews = book.reviews_set.all()
     context = {"book": book,
                "same_author": same_author,
-               "book_reviews": book_reviews}
+               "book_reviews": book_reviews
+               }
 
     return render(request, "books/detail.html", context)
 
@@ -152,10 +156,10 @@ def update_free_book(request, book_id):
             updated_book = form.save(commit=False)
             updated_book.price = 0
 
-        updated_book.save()
-        form.save_m2m()
+            updated_book.save()
+            form.save_m2m()
 
-        return HttpResponseRedirect(reverse("books:detail-books", kwargs={"book_id": updated_book.ID}))
+            return HttpResponseRedirect(reverse("books:detail-books", kwargs={"book_id": updated_book.ID}))
     else:
         form = UpdateFreeForm(instance=Books.objects.get(pk=book_id))
 
@@ -249,3 +253,129 @@ class DeleteReview(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
 #     def get_queryset(self):
 #         Genre = self.kwargs["requested_genre"]
 #         return Books.objects.filter(genre=Genre)
+
+
+@login_required
+def Cart_display_view(request):
+    user_cart = OrderItem.objects.filter(user=request.user).distinct()
+
+    def get_total_price():
+        total = 0
+        for i in user_cart:
+            total += i.item.price
+        return total
+
+    context = {"user_cart": user_cart, "total_price": get_total_price()}
+
+    return render(request, "books/user_cart.html", context)
+
+
+@login_required
+def add_item_to_cart(request, book_id):
+    if Books.objects.get(pk=book_id).is_free():
+        raise PermissionDenied
+
+    if OrderItem.objects.filter(user=request.user, item=Books.objects.get(pk=book_id)).exists():
+        messages.info(request, "This Item is already in your cart")
+
+    else:
+        new_item = OrderItem.objects.create(
+            item=Books.objects.get(pk=book_id), user=request.user)
+        messages.info(request, "The book was added to your cart")
+
+    return redirect(reverse("books:detail-books", kwargs={"book_id": book_id}))
+
+
+@login_required
+def remove_item_from_cart(request, book_id):
+
+    if OrderItem.objects.filter(user=request.user, item=Books.objects.get(pk=book_id)).exists():
+        OrderItem.objects.filter(
+            user=request.user, item=Books.objects.get(pk=book_id)).delete()
+
+    else:
+        messages.info(request, "This book isn't in your card")
+
+    return redirect(reverse("books:user-cart"))
+
+
+@login_required
+def empty_cart(request):
+    if OrderItem.objects.filter(user=request.user).exists():
+
+        OrderItem.objects.filter(
+            user=request.user).delete()
+        messages.info(request, "Your card is now empty")
+
+    else:
+        messages.info(request, "Your card is already empty")
+
+    return redirect(reverse("books:user-cart"))
+
+
+@login_required
+def create_order(request):
+    if OrderItem.objects.filter(user=request.user, ordered=False).exists():
+        print("YES")
+        Order.objects.filter(user=request.user, ordered=False).all().delete()
+        new_order = Order.objects.create(user=request.user, ordered=False,
+                                         order_date=timezone.now())
+
+        for product in OrderItem.objects.filter(user=request.user):
+            new_order.items.add(product)
+            new_order.save()
+
+    else:
+        print("NO")
+        messages.info(request, "Your cart is actually empty",
+                      )
+        return redirect(reverse("books:display-books"))
+
+    return redirect(reverse("books:checkout"))
+
+
+@login_required
+def checkout(request):
+    if request.method == "POST":
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            STREET = form.cleaned_data["street_address"]
+            APPARTMENT = form.cleaned_data["appartment_address"]
+            COUNTRY = form.cleaned_data["country"]
+            ZIP = form.cleaned_data["zip"]
+            PAYMENT_OPTION = form.cleaned_data["payment_options"]
+            SAVE = form.cleaned_data["remember"]
+
+            new_address = BillingAddress(user=request.user, street_address=STREET,
+                                         appartment_address=APPARTMENT, country=COUNTRY, zip=ZIP)
+
+            if BillingAddress.objects.filter(user=request.user, street_address=STREET,
+                                             appartment_address=APPARTMENT, country=COUNTRY, zip=ZIP).exists():
+                if SAVE == True:
+                    existing_address = BillingAddress.objects.get(user=request.user, street_address=STREET,
+                                                                  appartment_address=APPARTMENT, country=COUNTRY, zip=ZIP)
+                    existing_address.auto_complete = True
+
+                    existing_address.save()
+
+                pass
+
+            else:
+                if SAVE == True:
+                    new_address.auto_complete = True
+                new_address.save()
+
+            actual_order = Order.objects.filter(
+                user=request.user, ordered=False).get()
+
+            actual_order.billing_address = BillingAddress.objects.get(user=request.user, street_address=STREET,
+                                                                      appartment_address=APPARTMENT, country=COUNTRY, zip=ZIP)
+            actual_order.save()
+
+            return redirect("books:checkout")
+
+    else:
+        form = CheckoutForm()
+
+    return render(request, "books/checkout_page.html", {"form": form})

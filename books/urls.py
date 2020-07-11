@@ -36,7 +36,11 @@ urlpatterns = [
          views.empty_cart, name="empty-cart"),
     path("checkout/",
          views.checkout, name="checkout"),
-    path("order/", views.create_order, name="create-order")
+    path("order/", views.create_order, name="create-order"),
+    path("order_summary/", views.order_summary, name="order-summary"),
+    path("charge/", views.charge, name="charge"),
+
+
 
 
 

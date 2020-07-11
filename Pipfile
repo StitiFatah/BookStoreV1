@@ -19,6 +19,7 @@ pipfile = "*"
 lorem-text = "*"
 django-countries = "*"
 django-crispy-forms = "*"
+stripe = "*"
 
 [requires]
 python_version = "3.8"

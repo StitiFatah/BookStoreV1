@@ -244,6 +244,7 @@ class BillingAddress(models.Model):
     country = CountryField(multiple=True)
     zip = models.CharField(max_length=20)
     auto_complete = models.BooleanField(default=False)
+    auto_saved_date = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.user.username
@@ -257,6 +258,7 @@ class Order(models.Model):
         BillingAddress, on_delete=models.SET_NULL, blank=True, null=True)
     ordered = models.BooleanField(default=False)
     order_date = models.DateTimeField()
+    payment_method = models.CharField(max_length=200)
 
     def __str__(self):
         return self.user.username
@@ -266,3 +268,9 @@ class Order(models.Model):
         for ordered_items in self.items.all():
             total += ordered_items.item.price
         return total
+
+    def get_total_stripe(self):
+        total = 0
+        for ordered_items in self.items.all():
+            total += ordered_items.item.price
+        return total*100

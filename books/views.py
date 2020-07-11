@@ -15,6 +15,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.core.exceptions import PermissionDenied
 from users.models import PersoUser
+from django.conf import settings
+import stripe
+
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
 
 def home_display_books(request):
@@ -95,9 +99,15 @@ def DetailBook(request, book_id):
     same_author = Books.objects.filter(
         original_poster__in=book_original_poster).filter(pub_date__lte=timezone.now()).exclude(pk=book_id).distinct()
     book_reviews = book.reviews_set.all()
+
+    owned_books = []
+    for i in OrderItem.objects.filter(user=request.user, ordered=True):
+        owned_books.append(i.item)
+
     context = {"book": book,
                "same_author": same_author,
-               "book_reviews": book_reviews
+               "book_reviews": book_reviews,
+               "owned_books": owned_books
                }
 
     return render(request, "books/detail.html", context)
@@ -257,7 +267,8 @@ class DeleteReview(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
 
 @login_required
 def Cart_display_view(request):
-    user_cart = OrderItem.objects.filter(user=request.user).distinct()
+    user_cart = OrderItem.objects.filter(
+        user=request.user, ordered=False).distinct()
 
     def get_total_price():
         total = 0
@@ -275,12 +286,14 @@ def add_item_to_cart(request, book_id):
     if Books.objects.get(pk=book_id).is_free():
         raise PermissionDenied
 
-    if OrderItem.objects.filter(user=request.user, item=Books.objects.get(pk=book_id)).exists():
+    if OrderItem.objects.filter(user=request.user, item=Books.objects.get(pk=book_id), ordered=False).exists():
         messages.info(request, "This Item is already in your cart")
+    elif OrderItem.objects.filter(user=request.user, item=Books.objects.get(pk=book_id), ordered=True).exists():
+        messages.info(request, "You have already bought this item")
 
     else:
         new_item = OrderItem.objects.create(
-            item=Books.objects.get(pk=book_id), user=request.user)
+            item=Books.objects.get(pk=book_id), user=request.user, ordered=False)
         messages.info(request, "The book was added to your cart")
 
     return redirect(reverse("books:detail-books", kwargs={"book_id": book_id}))
@@ -356,6 +369,7 @@ def checkout(request):
                     existing_address = BillingAddress.objects.get(user=request.user, street_address=STREET,
                                                                   appartment_address=APPARTMENT, country=COUNTRY, zip=ZIP)
                     existing_address.auto_complete = True
+                    existing_address.auto_saved_date = timezone.now()
 
                     existing_address.save()
 
@@ -364,18 +378,77 @@ def checkout(request):
             else:
                 if SAVE == True:
                     new_address.auto_complete = True
+                    new_address.auto_saved_date = timezone.now()
                 new_address.save()
 
             actual_order = Order.objects.filter(
                 user=request.user, ordered=False).get()
 
-            actual_order.billing_address = BillingAddress.objects.get(user=request.user, street_address=STREET,
-                                                                      appartment_address=APPARTMENT, country=COUNTRY, zip=ZIP)
+            actual_order.billing_address = BillingAddress.objects.get(user=request.user,
+                                                                      street_address=STREET,
+                                                                      appartment_address=APPARTMENT,
+                                                                      country=COUNTRY, zip=ZIP)
+            actual_order.payment_method = PAYMENT_OPTION
+
             actual_order.save()
 
-            return redirect("books:checkout")
+            return redirect("books:order-summary")
 
     else:
-        form = CheckoutForm()
+        if BillingAddress.objects.filter(user=request.user, auto_complete=True).exists():
+            last_saved_address = BillingAddress.objects.filter(
+                user=request.user, auto_complete=True).order_by("-auto_saved_date").first()
+            form = CheckoutForm(initial={"zip": last_saved_address.zip,
+                                         "street_address": last_saved_address.street_address,
+                                         "appartment_address": last_saved_address.appartment_address,
+                                         "country": last_saved_address.country
+                                         })
+        else:
+            form = CheckoutForm()
 
     return render(request, "books/checkout_page.html", {"form": form})
+
+
+@login_required
+def order_summary(request):
+    if Order.objects.filter(user=request.user, ordered=False).exists() is False:
+        raise PermissionDenied
+    elif Order.objects.get(user=request.user, ordered=False).items.all().exists() is False:
+        raise PermissionDenied
+    elif Order.objects.get(user=request.user, ordered=False).payment_method not in ["P", "S"]:
+        raise PermissionDenied
+
+    else:
+        actual_order = Order.objects.get(user=request.user, ordered=False)
+        context = {"actual_order": actual_order,
+                   "country": str(actual_order.billing_address.country[0]),
+                   "street": actual_order.billing_address.street_address,
+                   "appartment": actual_order.billing_address.appartment_address,
+                   "zip": actual_order.billing_address.zip,
+                   ######
+                   "stripe_key": settings.STRIPE_TEST_PUBLISHABLE_KEY
+                   }
+
+    return render(request, "books/order_summary.html", context)
+
+
+@login_required
+def charge(request):
+    if request.method == "POST":
+        actual_order = Order.objects.get(user=request.user, ordered=False)
+
+        stripe.Charge.create(
+            amount=int(actual_order.get_total_stripe()),
+            currency="usd",
+            source=request.POST["stripeToken"],
+
+        )
+
+        actual_order.ordered = True
+        actual_order.save()
+
+        for i in actual_order.items.all():
+            i.ordered = True
+            i.save()
+
+    return render(request, "books/charge.html")

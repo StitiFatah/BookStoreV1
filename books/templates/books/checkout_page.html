@@ -17,6 +17,9 @@
 {% endfor %}
 </ul>
 {% endif %}
+
+
+
 <form action="" method="POST">
 
     {% csrf_token%}
@@ -24,7 +27,11 @@
     {{form|crispy}}
 
 
-    <button class="btn btn-primary" type="submit" name="" id=""> Continue </button>
+
+    <input type="submit">
+
+
+
 </form>
 
 </div>

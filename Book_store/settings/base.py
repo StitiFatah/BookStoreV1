@@ -29,6 +29,7 @@ SECRET_KEY = config('SECRET_KEY')
 INSTALLED_APPS = [
 
     # local apps
+    "library.apps.LibraryConfig",
     "books.apps.BooksConfig",
     "pages.apps.PagesConfig",
     "users.apps.UsersConfig",

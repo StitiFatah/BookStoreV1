@@ -52,9 +52,15 @@
                 {% else %}
 
                 <p class="card-text text=primary">{{book.price}} € </p>
+                {%if book in owned_books%}
+                <div><a class="btn btn-secondary mt-1" href="{% url 'books:add-to-cart' book.ID%}"> See in Library
+                    </a>
+                </div>
+                {%else%}
                 <div><a class="btn btn-secondary mt-1" href="{% url 'books:add-to-cart' book.ID%}"> Add book to cart
                     </a>
                 </div>
+                {%endif%}
                 {% endif %}
 
 

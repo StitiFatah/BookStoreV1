@@ -61,6 +61,10 @@ DATABASES = {
     }
 }
 
+
+STRIPE_TEST_PUBLISHABLE_KEY = config('STRIPE_TEST_PUBLISHABLE_KEY')
+STRIPE_TEST_SECRET_KEY = config('STRIPE_TEST_SECRET_KEY')
+
 # /!\ working sqlite
 # DATABASES = {
 #     'default': {

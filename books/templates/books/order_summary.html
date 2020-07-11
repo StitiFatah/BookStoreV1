@@ -1,0 +1,151 @@
+{% extends 'book_store/basic.html' %}
+{% load crispy_forms_tags %}
+
+
+
+{% block content%}
+
+
+{% if actual_order %}
+
+<div style="margin:8%">
+    <div class="row">
+        {% if messages %}
+
+        {% for message in messages %}
+        <div{% if message.tags %} class="alert-info p-1" {% endif %}>{{ message }} <a
+                href="{%url 'books:user-cart'%}"><i class="fas fa-shopping-cart"></i>
+
+            </a></div>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+
+    <div class="border border-secondary w-50 row col-6">
+        {%for product in actual_order.items.all %}
+
+        <div class="col-12">
+            <div><img style="width:100px;height:150px" src="{{product.item.cover.url}}"" alt="">
+            <span class=" ml-2 font-weight-bold">{{product.item.title}} {{product.item.price}} euro </span></div>
+
+        </div>
+        {%endfor%}
+
+        <div>
+
+
+        </div>
+
+
+
+    </div>
+
+
+    <div style="margin-left:20%" class="border border-secondary w-50 row col-3 ">
+
+        <h3 class="mx-auto"> Summary </h3>
+
+        {%for product in actual_order.items.all %}
+
+
+        <div class="col-12">
+
+            <span class=" ml-2 font-weight-bold">{{product.item.title}} {{product.item.price}} euro </span></div>
+
+
+        {%endfor%}
+
+
+
+        <div class="font-weight-bold"> <span>Total</span>
+            <span class="ml-5">{{actual_order.get_total}} euro</span>
+        </div>
+
+
+
+
+
+
+
+
+
+
+    </div>
+</div>
+
+<div class="border border-secondary w-50 mt-3 px-2 mx-auto">
+
+
+
+
+    <div class="">
+
+
+        <h3> Billing Address :</h3>
+        <div>{{street}}</div>
+        <div>{{appartment}}</div>
+        <div>{{zip}}</div>
+        <div>{{country}}</div>
+
+
+
+    </div>
+
+    <div class="mt-1">
+
+        <h3>Personal infos :</h3>
+        <div> {{user.first_name}} {{user.last_name}} </div>
+        <div> {{user.email}}</div>
+
+
+
+    </div>
+
+    <div>
+
+        <h3> Payment option </h3>
+
+        {%if actual_order.payment_method == "P"%}
+        <buttont class="btn btn-outline-primary mb-5"><i class="fab fa-paypal"></i>
+
+            </button>
+
+            {% elif actual_order.payment_method == "S"%}
+            <button class="btn btn-outline-primary mb-5">
+                <i style="width:30px;height:40px" class="fab fa-stripe"></i>
+
+
+
+
+            </button>
+
+
+            <form action="{% url 'books:charge' %}" method="post">
+                {% csrf_token %}
+                <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ stripe_key }}"
+                    data-description="Order" data-amount="{{actual_order.get_total_stripe}}" data-locale="auto">
+                    </script>
+            </form>
+
+
+
+            {%endif%}
+    </div>
+
+
+
+
+</div>
+
+</div>
+
+
+{%else%}
+<p>You don't have any order in preparation </p>
+
+
+
+{%endif%}
+
+{%endblock %}

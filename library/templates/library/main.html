@@ -1,0 +1,138 @@
+{% extends "book_store/basic.html" %}
+
+
+
+
+
+{%block content%}
+
+
+
+
+<div style="margin:5%">
+
+
+    {% if library  %}
+
+
+    <div class="row border border-secondary">
+
+
+
+        {% for book in library %}
+
+
+
+        <div class="col-3 ">
+            <div class="card my-2" style="width:180px">
+
+                <img style="width:180px;height:300px" src="{{book.item.cover.url}}" class="mx-auto" alt="">
+                <div class="card-body">
+                    <h5 class="card-title">{{book.item.title}}</h5>
+
+
+                    {% for poster in book.item.original_poster.all%}
+
+
+                    <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
+                    </a>
+
+                    {% endfor %}
+
+
+
+
+
+                    <p class=" card-text">Genre : {{book.item.get_genre_display}} <br> Posted :
+                        {{book.item.pub_date|date:"SHORT_DATE_FORMAT"}}
+                    </p>
+
+                </div>
+                </a>
+            </div>
+
+        </div>
+
+        {%endfor%}
+
+
+    </div>
+
+
+
+
+    {%endif%}
+
+    {% if free_library  %}
+
+
+    <div class="row border border-secondary mt-2">
+
+
+
+        {% for book in free_library %}
+
+
+
+        <div class="col-3 ">
+            <div class="card my-2" style="width:180px">
+
+                <img style="width:180px;height:300px" src="{{book.item.cover.url}}" class="mx-auto" alt="">
+                <div class="card-body">
+                    <h5 class="card-title">{{book.item.title}}</h5>
+
+
+                    {% for poster in book.item.original_poster.all%}
+
+
+                    <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
+                    </a>
+
+                    {% endfor %}
+
+
+
+
+
+                    <p class=" card-text">Genre : {{book.item.get_genre_display}} <br> Posted :
+                        {{book.item.pub_date|date:"SHORT_DATE_FORMAT"}}
+                    </p>
+                    <div> <a href="{% url 'library:remove-free-from-library' book.item.ID%}"> <i
+                                class="fas fa-trash-alt text-danger"></i>
+
+                        </a> </div>
+
+
+                </div>
+                </a>
+            </div>
+
+        </div>
+
+        {%endfor%}
+
+
+    </div>
+</div>
+
+{%else%}
+
+<p> Your library is empty </p>
+
+{%endif%}
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{%endblock content%}

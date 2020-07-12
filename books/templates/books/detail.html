@@ -16,8 +16,10 @@
     {% if messages %}
 
     {% for message in messages %}
-    <div{% if message.tags %} class="alert-info p-1" {% endif %}>{{ message }} <a href="{%url 'books:user-cart'%}"><i
-                class="fas fa-shopping-cart"></i>
+    <div{% if message.tags %} class="alert-info p-1" {% endif %}>{{ message }} <a href="{%url 'library:main-library'%}">
+            <i class="fas fa-book-open"></i>
+
+        </a> <a href="{%url 'books:user-cart'%}"><i class="fas fa-shopping-cart"></i>
 
         </a></div>
 {% endfor %}
@@ -47,13 +49,28 @@
 
                 {% if book.is_free %}
                 <p class=" card-text text-success"> Free </p>
-                <div><a href="{{book.pdf.url}}" class="btn btn-primary" target="_blank"> Download this book</a>
+                {%if book in free_library%}
+                <div><a class="btn btn-secondary mt-1" href="{% url 'library:main-library'%}"> See in Library
+                    </a>
                 </div>
+                {%else%}
+                <div><a href="{% url 'library:add-free-to-library' book.ID%}" class="btn btn-primary">
+                        Add to your library</a>
+                </div>
+                {%endif%}
+
+
+
+
+
+
                 {% else %}
+
+
 
                 <p class="card-text text=primary">{{book.price}} € </p>
                 {%if book in owned_books%}
-                <div><a class="btn btn-secondary mt-1" href="{% url 'books:add-to-cart' book.ID%}"> See in Library
+                <div><a class="btn btn-secondary mt-1" href="{% url 'library:main-library'%}"> See in Library
                     </a>
                 </div>
                 {%else%}
@@ -189,6 +206,8 @@
     {%endfor%}
 </div>
 {% endif %}
+
+
 
 
 {%endblock content%}

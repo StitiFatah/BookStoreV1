@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.views import generic
 from .models import (Books, Reviews,
                      OrderItem, BillingAddress, Order)
+from library.models import FreeLibrary
 from django.utils import timezone
 from .forms import (CreateFreeForm, CreateNonFreeForm,
                     UpdateFreeForm, UpdateNonFreeForm,
@@ -107,7 +108,8 @@ def DetailBook(request, book_id):
     context = {"book": book,
                "same_author": same_author,
                "book_reviews": book_reviews,
-               "owned_books": owned_books
+               "owned_books": owned_books,
+               "free_library": FreeLibrary.objects.filter(user=request.user)
                }
 
     return render(request, "books/detail.html", context)
@@ -302,9 +304,9 @@ def add_item_to_cart(request, book_id):
 @login_required
 def remove_item_from_cart(request, book_id):
 
-    if OrderItem.objects.filter(user=request.user, item=Books.objects.get(pk=book_id)).exists():
+    if OrderItem.objects.filter(user=request.user, item=Books.objects.get(pk=book_id), ordered=False).exists():
         OrderItem.objects.filter(
-            user=request.user, item=Books.objects.get(pk=book_id)).delete()
+            user=request.user, item=Books.objects.get(pk=book_id), ordered=False).delete()
 
     else:
         messages.info(request, "This book isn't in your card")
@@ -314,10 +316,10 @@ def remove_item_from_cart(request, book_id):
 
 @login_required
 def empty_cart(request):
-    if OrderItem.objects.filter(user=request.user).exists():
+    if OrderItem.objects.filter(user=request.user, ordered=False).exists():
 
         OrderItem.objects.filter(
-            user=request.user).delete()
+            user=request.user, ordered=False).delete()
         messages.info(request, "Your card is now empty")
 
     else:
@@ -334,7 +336,7 @@ def create_order(request):
         new_order = Order.objects.create(user=request.user, ordered=False,
                                          order_date=timezone.now())
 
-        for product in OrderItem.objects.filter(user=request.user):
+        for product in OrderItem.objects.filter(user=request.user, ordered=False):
             new_order.items.add(product)
             new_order.save()
 
@@ -452,3 +454,19 @@ def charge(request):
             i.save()
 
     return render(request, "books/charge.html")
+
+
+@login_required
+def display_ordered_books(request):
+    confirmed_orders = Order.objects.filter(user=request.user, ordered=True)
+
+    # display the country in acceptable way
+    context = {"confirmed_orders": confirmed_orders,
+               }
+
+    if confirmed_orders.exists():
+        for i in confirmed_orders:
+            country = str(i.billing_address.country[0])
+        context["country"] = country
+
+    return render(request, "books/confirmed_order.html", context)

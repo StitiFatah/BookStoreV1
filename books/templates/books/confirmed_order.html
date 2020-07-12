@@ -1,0 +1,118 @@
+{% extends 'book_store/basic.html' %}
+\
+
+
+
+{% block content%}
+
+
+{% if confirmed_orders %}
+
+<div style="margin:8%">
+
+
+    {%for order in confirmed_orders%}
+
+
+    <div class="row">
+        <div class="border border-secondary col-8 m-2  ">
+            <table class="table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+                        <th>Total Price</th>
+
+                    </tr>
+
+
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr>
+
+                        <td>{{order.order_date}}</td>
+                        <td>{{order.get_total}} euro</td>
+                    </tr>
+
+
+                    {%for product in order.items.all%}
+                    <tr>
+
+                        <td><img style="width:100px;height:150px" src="{{product.item.cover.url}}" alt="">
+                            {{product.item.title}}</td>
+
+                        <td>{{product.item.price}} euro</td>
+                    </tr>
+
+
+
+                    {%endfor%}
+
+                </tbody>
+
+
+
+            </table>
+
+
+
+
+        </div>
+
+
+
+        <div class="border border-secondary col-3 m-3 ">
+            <h3> Billing Infos </h3>
+            <div> {{user.first_name}}</div>
+            <div>{{user.last_name}}</div>
+            <div> {{order.billing_address.street_address}}</div>
+            <div> {{order.billing_address.appartment_address}}</div>
+            <div> {{country}}</div>
+            <div> {{order.billing_address.zip}}</div>
+
+            <div> Payment method : {%if order.payment_method == "S"%} Stripe {% elif order.payment_method == "P"%}
+                Paypal {%endif%}</div>
+
+
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+
+
+    {%endfor%}
+
+
+
+    {%else%}
+    <p>You don't have any confirmed order </p>
+
+</div>
+
+
+{%endif%}
+
+
+
+
+{%endblock %}

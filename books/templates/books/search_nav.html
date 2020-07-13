@@ -14,54 +14,49 @@
 
 
 
-<div style="margin-top:5%" class="d-flex flex-column">
 
 
 
-    <form class="float-left form-inline" action="{% url 'books:index-specific-search' GENRE %}" method="get">
-        {% csrf_token %}
 
-        <div class="form-group">
-
-
-            <label id="SearchButton" for="Search_Id" class="text-info mr-2" type="submit">
-                <i class="fas fa-search "> </i> </label>
-
-            <div class="SearchBox custom-selection">
-
-                <select class="" name="searchtarget" id="Search_Target">
-
-                    <option class="" value="title">
-
-                        title
-                    </option>
+<form class="form-inline  " action="{% url 'books:index-specific-search' GENRE %}" method="get">
+    {% csrf_token %}
 
 
-                    <option value="author">
-
-                        author
-                    </option>
+    <div class="search-bar-div p-4">
 
 
 
-                </select>
+        <div class="SearchBox">
+
+            <button type="submit" class=" btn text-info "> <i class="fas fa-search "> </i>
+            </button>
+
+            <select class="border-0 bg-light form-control" name="searchtarget" id="Search_Target">
+
+                <option class="" value="title">
+
+                    title
+                </option>
 
 
-                <input placeholder="{{GENRE}}" class="text-secondary  " name="search" type="text" id="Search_Id">
+                <option value="author">
 
-            </div>
+                    author
+                </option>
+
+
+
+            </select>
+
+
+            <input class="text-secondary border-0 form-control w-75" name="search" type="text" id="Search_Id"
+                placeholder="{{GENRE}}">
+
+
 
         </div>
-
-    </form>
-
-</div>
-
-
-{% if page_obj %}
-
-
-<div style="margin-top:8%;margin-bottom : 5%;" class="">
+    </div>
+</form>
 
 
 
@@ -69,125 +64,132 @@
 
 
 
-    <div style="" class="row border border-secondary">
 
+
+
+<div class="container">
+    {% if page_obj %}
+    <h2 class="mt-3 mb-2 view-header text-center p-2 ">FROM THE SAME AUTHOR</h2>
+
+
+
+
+
+
+
+
+    <div class="row w-100 ">
 
         {% for book in page_obj %}
 
+        <div class="col-sm col-md-3  py-2">
+
+            <div class="card h-100 text-dark border-0 shadow-lg  ">
+
+                <div class="card-body">
+                    <a href="{% url 'books:detail-books' book.ID%}">
+                        <h5 class="card-title overflow text-dark"> {{book.title}}</h5>
+                    </a>
+                    {% for poster in book.original_poster.all%}
 
 
-        <div class="col-2 ">
-            <div class="card my-2" style="width:180px">
-                <a href="{% url 'books:detail-books' book.ID%}">
-                    <img style="width:180px;height:300px" src="{{book.cover.url}}" class="mx-auto" alt="">
-                    <div class="card-body">
-                        <h5 class="card-title">{{book.title}}</h5>
-                        {% for poster in book.original_poster.all%}
+                    <a class="overflow" href="{%url 'users:public_profile' poster.ID%}">
+                        {{poster.username}}
+                    </a>
+
+                    {% endfor %}
+                    <a href="{% url 'books:detail-books' book.ID%}">
+                        <img src="{{book.cover.url}}" class="card-img-top img-fluid" alt=""></a>
+                    {% if book.is_free %}
 
 
-                        <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
-                        </a>
-
-                        {% endfor %}
-
-                        <p class="card-text">Genre : {{book.get_genre_display}} <br> Posted :
-                            {{book.pub_date|date:"SHORT_DATE_FORMAT"}}
-                        </p>
-                        {% if book.is_free %}
-                        <a href="#" style="background:#00c972" class="btn text-light">
-
-                            Free </a>
-                        {% else %}
-
-                        <a href="#" class="btn btn-primary">
-
-                            {{book.price}} € </a>
-                        {% endif %}
-                        {% if user in book.original_poster.all or user.is_admin %}
-
-                        {%if book.is_free %}
-
-                        <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
-                        <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                        {%else%}
-
-                        <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
-                        <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                        {%endif%}
-                        {% endif %}
+                    <p style="color:#43B14B" class="mt-1 font-weight-bold "> Free </p>
+                    {% else %}
 
 
-                    </div>
-                </a>
+                    <p class="mt-1 font-weight-bold">{{book.price}} €</p>
+
+                    {% endif %}
+
+                    <p class=" card-text card-footer text-muted ">Genre : {{book.get_genre_display}}
+                        <br>
+                        Posted :
+                        <span class="card-date">{{book.pub_date|date:"SHORT_DATE_FORMAT"}}</span>
+                    </p>
+                </div>
+
             </div>
 
         </div>
 
         {%endfor%}
-
     </div>
-
-    {%else%}
-
-    <p style="margin-top:2%" class="alert-info p-2"> Sorry no book in this category</p>
-
-    {%endif%}
+</div>
 
 
 
 
-    <div class="text-center mb-3">
-
-        {% if page_obj.has_previous %}
-
-
-        <a class="text-primary text-decoration-none" href="?page=1">
-            <i class="fas fa-angle-double-left fa-lg "></i>
-
-        </a>
-        <a class="text-primary  text-decoration-none" href="?page= {{ page_obj.previous_page_number}}">
-            <i class="fas fa-angle-left fa-lg"></i>
-        </a>
-
-
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-
-        {% if page_obj.number == num%}
-
-        <a style="font-size:22px" class="text-primary font-weight-bold mx-1" href="?page={{ num }}">{{ num }}</a>
-
-        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
-
-
-        <a style=" font-size:22px " class="  text-secondary mx-1" href="?page={{ num }}">{{ num }}</a>
 
 
 
 
-        {% endif %}
 
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-
-        <a class=" text-primary  text-decoration-none  " href="?page={{page_obj.next_page_number}}">
-            <i class="fas fa-angle-right fa-lg"></i>
-        </a>
-        <a class=" text-primary text-decoration-none  " href="?page= {{ page_obj.paginator.num_pages}}">
+{% endif %}
 
 
-            <i class="fas fa-angle-double-right fa-lg"></i>
-
-        </a>
 
 
-        {% endif %}
 
-    </div>
+<div class="text-center mb-3">
+
+    {% if page_obj.has_previous %}
 
 
-    {% endblock %}
+    <a class="text-primary text-decoration-none" href="?page=1">
+        <i class="fas fa-angle-double-left fa-lg "></i>
+
+    </a>
+    <a class="text-primary  text-decoration-none" href="?page= {{ page_obj.previous_page_number}}">
+        <i class="fas fa-angle-left fa-lg"></i>
+    </a>
+
+
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+
+    {% if page_obj.number == num%}
+
+    <a style="font-size:22px" class="text-primary font-weight-bold mx-1" href="?page={{ num }}">{{ num }}</a>
+
+    {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+
+
+    <a style=" font-size:22px " class="  text-secondary mx-1" href="?page={{ num }}">{{ num }}</a>
+
+
+
+
+    {% endif %}
+
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+
+    <a class=" text-primary  text-decoration-none  " href="?page={{page_obj.next_page_number}}">
+        <i class="fas fa-angle-right fa-lg"></i>
+    </a>
+    <a class=" text-primary text-decoration-none  " href="?page= {{ page_obj.paginator.num_pages}}">
+
+
+        <i class="fas fa-angle-double-right fa-lg"></i>
+
+    </a>
+
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

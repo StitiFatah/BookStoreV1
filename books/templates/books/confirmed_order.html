@@ -8,14 +8,14 @@
 
 {% if confirmed_orders %}
 
-<div style="margin:8%">
+<div class="container mt-3"">
 
-
+<h2 class=" text-center mb-3 view-header p-2">Confirmed Orders </h2>
     {%for order in confirmed_orders%}
 
 
-    <div class="row">
-        <div class="border border-secondary col-8 m-2  ">
+    <div class=" row">
+        <div class="col-8 m-2 bg-light border-0 shadow-lg ">
             <table class="table">
 
                 <thead>
@@ -67,7 +67,7 @@
 
 
 
-        <div class="border border-secondary col-3 m-3 ">
+        <div class=" col-3 m-3 bg-light border-0 shadow-lg">
             <h3> Billing Infos </h3>
             <div> {{user.first_name}}</div>
             <div>{{user.last_name}}</div>

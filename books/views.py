@@ -102,15 +102,16 @@ def DetailBook(request, book_id):
     book_reviews = book.reviews_set.all()
 
     owned_books = []
-    for i in OrderItem.objects.filter(user=request.user, ordered=True):
-        owned_books.append(i.item)
-
     context = {"book": book,
                "same_author": same_author,
                "book_reviews": book_reviews,
                "owned_books": owned_books,
-               "free_library": FreeLibrary.objects.filter(user=request.user)
                }
+
+    if not request.user.is_anonymous:
+        for i in OrderItem.objects.filter(user=request.user, ordered=True):
+            owned_books.append(i.item)
+        context["free_library"] = FreeLibrary.objects.filter(user=request.user)
 
     return render(request, "books/detail.html", context)
 
@@ -470,3 +471,10 @@ def display_ordered_books(request):
         context["country"] = country
 
     return render(request, "books/confirmed_order.html", context)
+
+
+def Settings(request):
+
+    return render(request, "books/settings.html")
+
+# def Manage_Addresses(request):

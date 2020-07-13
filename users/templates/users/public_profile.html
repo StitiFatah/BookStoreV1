@@ -6,94 +6,191 @@
 {% block content%}
 
 
-<div style="margin:8% 5%">
-
-
-
-
-    <table class="table">
-
-        <tr>
-            <td>Username</td>
-            <td>{{perso_user.username}}</td>
-        </tr>
-
-        <tr>
-            <td>First Name </td>
-            <td>{{perso_user.first_name}}</td>
-        </tr>
-
-        <tr>
-            <td>Last Name</td>
-            <td>{{perso_user.last_name}}</td>
-        </tr>
-        <tr>
-            <td>Bio</td>
-            <td>{{perso_user.profile.bio}}</td>
-        </tr>
-
-    </table>
-
-
-</div>
-
-
-{% if same_author_books %}
-
-<p class="font-weight-bold text-center text-primary">{{perso_user.username}}'s books </p>
-<div class="row">
-    {% for book in same_author_books %}
-    <div class="col-2 ">
-        <div class=" card my-2" style="width:180px">
-            <a href="{% url 'books:detail-books' book.ID%}">
-
-                <img style="width:180px;height:300px" src="{{book.cover.url}}" class="mx-auto" alt="">
+<div class="container">
+    <div class="row">
+        <div class="col m-2">
+            <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">{{book.title}}</h5>
-                    {% for poster in book.original_poster.all%}
+                    <div class="row">
+                        <div class="col-12 col-lg-8 col-md-6">
+                            <h3 class="mb-0 text-truncated">{{perso_user.username}}</h3>
+                            <p class="mt-1  text-truncated"> {{perso_user.last_name}} {{perso_user.first_name}}</p>
+
+                            <p class="lead">Writer</p>
+
+                            <hr>
+
+                            <p>
+                                {{perso_user.profile.bio}}
+                            </p>
+                            <p>
+                                {%for book in same_author_books %}
+
+                                <span class="badge badge-info tags">{{book.get_genre_display}}</span>
 
 
-                    <a href="{%  url 'users:public_profile' poster.ID %}"> {{poster.username}}</a>
-
-                    {% endfor %}
-                    <p class="card-text">Genre : {{book.get_genre_display}} <br> Posted :
-                        {{book.pub_date|date:"SHORT_DATE_FORMAT"}}
-                    </p>
-
-                    {% if book.price == 0 %}
-                    <a href="#" style="background:#00c972" class="btn text-light">
-
-                        Free </a>
-                    {% else %}
-
-                    <a href="#" class="btn btn-primary">
-
-                        {{book.price}} € </a>
-                    {% endif %}
-
-                    {% if user in book.original_poster.all or user.is_admin %}
-
-                    {%if book.is_free %}
-
-                    <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
-                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                    {%else%}
-
-                    <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
-                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                    {%endif%}
-                    {% endif %}
+                                {%endfor%}
+                            </p>
+                        </div>
+                        <div class="col-12 col-lg-4 col-md-6 text-center">
+                            <img src="{{user.profile.profile_picture.url}}" alt=""
+                                class="mx-auto rounded-circle img-fluid">
+                            <br>
+                            <ul class="list-inline ratings text-center" title="Ratings">
+                                <li class="list-inline-item"><a href="#"><span class="fa fa-star"></span></a>
+                                </li>
+                                <li class="list-inline-item"><a href="#"><span class="fa fa-star"></span></a>
+                                </li>
+                                <li class="list-inline-item"><a href="#"><span class="fa fa-star"></span></a>
+                                </li>
+                                <li class="list-inline-item"><a href="#"><span class="fa fa-star"></span></a>
+                                </li>
+                                <li class="list-inline-item"><a href="#"><span class="fa fa-star"></span></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h3 class="mb-0">{{perso_user.books_set.all|length}}</h3>
+                            <small>Published Books</small>
+                            <button class="btn btn-block btn-outline-success"><span class="fa fa-plus-circle"></span>
+                                Follow</button>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h3 class="mb-0">245</h3>
+                            <small>Following</small>
+                            <button class="btn btn-outline-info btn-block"><span class="fa fa-user"></span> View
+                                Profile</button>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <h3 class="mb-0">43</h3>
+                            <small>Snippets</small>
+                            <button type="button" class="btn btn-outline-primary btn-block"><span
+                                    class="fa fa-gear"></span> Options</button>
+                        </div>
+                        <!--/col-->
+                    </div>
+                    <!--/row-->
                 </div>
-            </a>
+                <!--/card-block-->
+            </div>
         </div>
-
     </div>
-    {%endfor%}
-</div>
-{% endif %}
 
 
 
-{% endblock%}
+
+
+
+
+
+
+
+
+
+    <div class="container">
+        {% if same_author_books %}
+        <p class="font-weight-bold text-center text-dark mt-2">FROM THE SAME AUTHOR </p>
+
+
+
+
+
+
+
+
+        <div class="row w-100 ">
+
+            {% for book in same_author_books %}
+
+            <div class="col-12 col-sm-6d col-md-4 col-lg-3  py-2">
+
+                <div class="card h-100 text-dark border-0 shadow-lg  ">
+
+                    <div class="card-body">
+                        <a href="{% url 'books:detail-books' book.ID%}">
+                            <h5 class="card-title overflow text-dark"> {{book.title}}</h5>
+                        </a>
+                        {% for poster in book.original_poster.all%}
+
+
+                        <a class="overflow" href="{%url 'users:public_profile' poster.ID%}">
+                            {{poster.username}}
+                        </a>
+
+                        {% endfor %}
+                        <a href="{% url 'books:detail-books' book.ID%}">
+                            <img src="{{book.cover.url}}" class="card-img-top img-fluid" alt=""></a>
+                        {% if book.is_free %}
+
+
+                        <p style="color:#43B14B" class="mt-1 font-weight-bold "> Free </p>
+                        {% else %}
+
+
+                        <p class="mt-1 font-weight-bold">{{book.price}} €</p>
+
+                        {% endif %}
+
+                        <p class=" card-text card-footer text-muted ">Genre : {{book.get_genre_display}}
+                            <br>
+                            Posted :
+                            <span class="card-date">{{book.pub_date|date:"SHORT_DATE_FORMAT"}}</span>
+                        </p>
+
+                        {% if user in book.original_poster.all or user.is_admin %}
+
+                        {%if book.is_free %}
+
+                        <div class=" d-flex flex-row justify-content-between">
+
+                            <div> <button class="btn btn-outline-primary p-1 rounded"><a
+                                        href=" {%url 'books:update-view' book.ID %} "> <span class="BTNN">update</span>
+                                </button> </div>
+                            <div> <button class="btn btn-outline-danger p-1 rounded">
+                                    <a href=" {%url 'books:delete-view' book.ID %} "> <span
+                                            class="BTNN-danger">delete</span>
+                                    </a></button> </div>
+
+
+                        </div>
+                        {%else%}
+                        <div class=" d-flex flex-row justify-content-between">
+
+                            <div> <button class="btn btn-outline-primary p-1 rounded"><a
+                                        href=" {%url 'books:update-non-free-view' book.ID %} "> <span class="BTNN">
+                                            update</span> </button> </div>
+                            <div> <button class="btn btn-outline-danger p-1 rounded ">
+                                    <a href=" {%url 'books:delete-view' book.ID %} "> <span
+                                            class="BTNN-danger">delete</span> </a></button> </div>
+
+
+                        </div>
+
+
+                        {%endif%}
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {%endfor%}
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+    {% endif %}
+
+
+
+
+    {% endblock%}

@@ -8,7 +8,8 @@
 
 {% if actual_order %}
 
-<div style="margin:8%">
+<div class="container mt-3 mb-5">
+    <h2 class="view-header text-center p-2 mb-5"> Payment </h2>
     <div class="row">
         {% if messages %}
 
@@ -22,124 +23,177 @@
     {% endif %}
 
 
-    <div class="border border-secondary w-50 row col-6">
-        {%for product in actual_order.items.all %}
 
-        <div class="col-12">
-            <div><img style="width:100px;height:150px" src="{{product.item.cover.url}}"" alt="">
-            <span class=" ml-2 font-weight-bold">{{product.item.title}} {{product.item.price}} euro </span></div>
+    <div class="border border-secondary w-50 row col-md-7 bg-light">
+
+
+
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Price</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+                {% for items in actual_order.items.all%}
+                <tr>
+                    <td>
+
+                        <div class="d-flex flex-row ">
+                            <div>
+                                <a href="{% url 'books:detail-books' items.item.ID%}" target="_blank"><img
+                                        style="width:150px;height:150px" src="{{items.item.cover.url}}" alt=""></a>
+
+
+
+                            </div>
+
+
+
+
+
+                            <div class="  ml-2 ">
+                                <a href="{% url 'books:detail-books' items.item.ID%}" target="_blank">
+                                    <div class=" font-weight-bold text-dark">{{items.item.title}}</div>
+                                </a>
+
+
+                                {% for poster in items.item.original_poster.all%}
+
+
+
+                                {%endfor%}
+
+
+
+                            </div>
+
+                        </div>
+
+                    </td>
+                    <td class="">{{items.item.price}} €</td>
+                </tr>
+                {%endfor%}
+
+
+            </tbody>
+        </table>
+
+
+    </div>
+
+
+    <div class="border border-secondary  row col-md-4 bg-light ml-5 mb-5">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">Price</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+                {% for items in actual_order.items.all%}
+                <tr>
+                    <td>
+
+                        <div class="d-flex flex-row ">
+
+
+
+
+                            <a href="{% url 'books:detail-books' items.item.ID%}" target="_blank">
+                                <div class=" font-weight-bold text-dark">{{items.item.title}}</div>
+                            </a>
+
+
+
+                        </div>
+
+                    </td>
+                    <td>{{items.item.price}} €</td>
+                </tr>
+
+
+
+                {%endfor%}
+
+                <tr>
+
+                    <td class="font-weight-bold">Total Price :</td>
+                    <td class="font-weight-bold">{{actual_order.get_total}} €</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="mt-0">
+            <h3> Billing Address :</h3>
+            <div>{{street}}</div>
+            <div>{{appartment}}</div>
+            <div>{{zip}}</div>
+            <div>{{country}}</div>
+
 
         </div>
-        {%endfor%}
-
         <div>
 
+            <h3>Personal infos :</h3>
+            <div> {{user.first_name}} {{user.last_name}} </div>
+            <div> {{user.email}}</div>
+
+
+        </div>
+
+        <div class="mb-2">
+            <h3> Payment option : </h3>
+
+            {%if actual_order.payment_method == "P"%}
+            <buttont class="btn btn-outline-primary mb-5"><i class="fab fa-paypal"></i>
+
+                </button>
+
+                {% elif actual_order.payment_method == "S"%}
+                <form action="{% url 'books:charge' %}" method="post">
+                    {% csrf_token %}
+                    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                        data-key="{{ stripe_key }}" data-description="Order"
+                        data-amount="{{actual_order.get_total_stripe}}" data-locale="auto">
+                        </script>
+                </form>
+
+
+
+                </button>
+                {%endif%}
+
 
         </div>
 
 
 
     </div>
-
-
-    <div style="margin-left:20%" class="border border-secondary w-50 row col-3 ">
-
-        <h3 class="mx-auto"> Summary </h3>
-
-        {%for product in actual_order.items.all %}
-
-
-        <div class="col-12">
-
-            <span class=" ml-2 font-weight-bold">{{product.item.title}} {{product.item.price}} euro </span></div>
-
-
-        {%endfor%}
-
-
-
-        <div class="font-weight-bold"> <span>Total</span>
-            <span class="ml-5">{{actual_order.get_total}} euro</span>
-        </div>
-
-
-
-
-
-
-
-
-
-
-    </div>
 </div>
 
-<div class="border border-secondary w-50 mt-3 px-2 mx-auto">
 
 
 
 
-    <div class="">
-
-
-        <h3> Billing Address :</h3>
-        <div>{{street}}</div>
-        <div>{{appartment}}</div>
-        <div>{{zip}}</div>
-        <div>{{country}}</div>
-
-
-
-    </div>
-
-    <div class="mt-1">
-
-        <h3>Personal infos :</h3>
-        <div> {{user.first_name}} {{user.last_name}} </div>
-        <div> {{user.email}}</div>
-
-
-
-    </div>
-
-    <div>
-
-        <h3> Payment option </h3>
-
-        {%if actual_order.payment_method == "P"%}
-        <buttont class="btn btn-outline-primary mb-5"><i class="fab fa-paypal"></i>
-
-            </button>
-
-            {% elif actual_order.payment_method == "S"%}
-            <button class="btn btn-outline-primary mb-5">
-                <i style="width:30px;height:40px" class="fab fa-stripe"></i>
 
 
 
 
-            </button>
 
 
-            <form action="{% url 'books:charge' %}" method="post">
-                {% csrf_token %}
-                <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ stripe_key }}"
-                    data-description="Order" data-amount="{{actual_order.get_total_stripe}}" data-locale="auto">
-                    </script>
-            </form>
-
-
-
-            {%endif%}
-    </div>
 
 
 
 
 </div>
-
-</div>
-
 
 {%else%}
 <p>You don't have any order in preparation </p>

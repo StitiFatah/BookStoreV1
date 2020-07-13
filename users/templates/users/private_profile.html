@@ -1,5 +1,6 @@
 {% extends "book_store/basic.html"%}
 
+{% load crispy_forms_tags %}
 
 
 {% block title%} Profile {%endblock%}
@@ -7,118 +8,151 @@
 
 {% block content %}
 
-<div style="margin : 8% 5%">
-
-    <table class="table">
-
-        <tr>
-            <td>Username</td>
-            <td>{{user.username}}</td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td>{{user.email}}</td>
-        </tr>
-
-        <tr>
-            <td>First Name </td>
-            <td>{{user.first_name}}</td>
-        </tr>
-
-        <tr>
-            <td>Last Name</td>
-            <td>{{user.last_name}}</td>
-        </tr>
-        <tr>
-            <td>Bio</td>
-            <td>{{user.profile.bio}}</td>
-        </tr>
 
 
 
 
 
+<div class="container">
 
-    </table>
+    {% if messages %}
 
+    {% for message in messages %}
+    <p{% if message.tags %} class="{{ message.tags }} alert-info p-2 mt-1" {% endif %}>{{ message }}</p>
+        {% endfor %}
 
-    <button class="btn btn-secondary" data-toggle="collapse" data-target="#UpdateProfile"> Edit Profile <i
-            class="fas fa-caret-down"></i> </button>
+        {% endif %}
 
-    <div class="collapse mt-3" id="UpdateProfile">
-
-        <form action="" method="POST">
-
-            {% csrf_token %}
-
-            {{u_form.as_p}}
-            {{p_form.as_p}}
-
-            <input class="btn btn-outline-info" type="submit">
+        <h2 class="mt-3 mb-2 view-header text-center p-2 ">UPDATE INFOS </h2>
 
 
-        </form>
-    </div>
 
+        <div class="mt-4">
+
+
+            <form action="" method="POST">
+
+                {% csrf_token %}
+
+                {{u_form|crispy}}
+                {{p_form|crispy}}
+
+                <button class="btn btn-outline-info" type="submit"> Update </button>
+
+
+            </form>
+
+
+        </div>
 
 </div>
 
 
-{% if my_books %}
 
-<p class="font-weight-bold text-center text-primary">My books </p>
-<div class="row">
-    {% for book in my_books %}
-    <div class="col-2 ">
-        <div class=" card my-2" style="width:180px">
-            <a href="{% url 'books:detail-books' book.ID%}">
 
-                <img style="width:180px;height:300px" src="{{book.cover.url}}" class="mx-auto" alt="">
+
+
+<div class="container">
+    {% if my_books %}
+    <p class="font-weight-bold text-center text-dark mt-2">My books </p>
+
+
+
+
+
+
+
+
+    <div class="row w-100 ">
+
+        {% for book in my_books %}
+
+        <div class="col-12 col-sm-6d col-md-4 col-lg-3 py-2">
+
+            <div class="card h-100 text-dark border-0 shadow-lg  ">
+
                 <div class="card-body">
-                    <h5 class="card-title">{{book.title}}</h5>
+                    <a href="{% url 'books:detail-books' book.ID%}">
+                        <h5 class="card-title overflow text-dark"> {{book.title}}</h5>
+                    </a>
                     {% for poster in book.original_poster.all%}
 
 
-                    <a href="{%  url 'users:public_profile' poster.ID %}"> {{poster.username}}</a>
+                    <a class="overflow" href="{%url 'users:public_profile' poster.ID%}">
+                        {{poster.username}}
+                    </a>
 
                     {% endfor %}
-                    <p class="card-text">Genre : {{book.get_genre_display}} <br> Posted :
-                        {{book.pub_date|date:"SHORT_DATE_FORMAT"}}
-                    </p>
-
+                    <a href="{% url 'books:detail-books' book.ID%}">
+                        <img src="{{book.cover.url}}" class="card-img-top img-fluid" alt=""></a>
                     {% if book.is_free %}
-                    <a href="#" style="background:#00c972" class="btn text-light">
 
-                        Free </a>
+
+                    <p style="color:#43B14B" class="mt-1 font-weight-bold "> Free </p>
                     {% else %}
 
-                    <a href="#" class="btn btn-primary">
 
-                        {{book.price}} € </a>
+                    <p class="mt-1 font-weight-bold">{{book.price}} €</p>
+
                     {% endif %}
 
+                    <p class=" card-text card-footer text-muted ">Genre : {{book.get_genre_display}}
+                        <br>
+                        Posted :
+                        <span class="card-date">{{book.pub_date|date:"SHORT_DATE_FORMAT"}}</span>
+                    </p>
                     {% if user in book.original_poster.all or user.is_admin %}
 
                     {%if book.is_free %}
 
-                    <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
-                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+                    <div class=" d-flex flex-row justify-content-between">
 
+                        <div> <button class="btn btn-outline-primary p-1 rounded"><a
+                                    href=" {%url 'books:update-view' book.ID %} "> <span class="BTNN">update</span>
+                            </button> </div>
+                        <div> <button class="btn btn-outline-danger p-1 rounded">
+                                <a href=" {%url 'books:delete-view' book.ID %} "> <span
+                                        class="BTNN-danger">delete</span>
+                                </a></button> </div>
+
+
+                    </div>
                     {%else%}
+                    <div class=" d-flex flex-row justify-content-between">
 
-                    <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
-                    <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
+                        <div> <button class="btn btn-outline-primary p-1 rounded"><a
+                                    href=" {%url 'books:update-non-free-view' book.ID %} "> <span class="BTNN">
+                                        update</span> </button> </div>
+                        <div> <button class="btn btn-outline-danger p-1 rounded ">
+                                <a href=" {%url 'books:delete-view' book.ID %} "> <span
+                                        class="BTNN-danger">delete</span> </a></button> </div>
+
+
+                    </div>
+
 
                     {%endif%}
                     {% endif %}
-
                 </div>
-            </a>
+
+            </div>
+
         </div>
 
+        {%endfor%}
     </div>
-    {%endfor%}
 </div>
+
+
+
+
+
+
+
+
+
 {% endif %}
+
+
 
 {% endblock content%}

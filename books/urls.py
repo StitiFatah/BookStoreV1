@@ -40,7 +40,9 @@ urlpatterns = [
     path("order_summary/", views.order_summary, name="order-summary"),
     path("charge/", views.charge, name="charge"),
     path("confirmed_orders/", views.display_ordered_books,
-         name="confirmed-ordered-books")
+         name="confirmed-ordered-books"),
+    path("settings/", views.Settings,
+         name="settings"),
 
 
 

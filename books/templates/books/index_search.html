@@ -14,135 +14,123 @@
 
 
 
-{%if books%}
-
-<div style="margin-top:5%;margin-bottom : 5%;" class="">
-
+<div class="container mt-3">
+    {% if books %}
 
 
-
-
-
-
-    <div style="width :100% ;" class="row border border-secondary">
-
+    <div class="row w-100 ">
 
         {% for book in books %}
 
+        <div class="col-12 col-sm-6d col-md-4 col-lg-3  py-2">
+
+            <div class="card h-100 text-dark border-0 shadow-lg  ">
+
+                <div class="card-body">
+                    <a href="{% url 'books:detail-books' book.ID%}">
+                        <h5 class="card-title overflow text-dark"> {{book.title}}</h5>
+                    </a>
+                    {% for poster in book.original_poster.all%}
 
 
-        <div class="col-2 ">
-            <div class="card my-2" style="width:180px">
-                <a href="{% url 'books:detail-books' book.ID%}">
-                    <img style="width:180px;height:300px" src="{{book.cover.url}}" class="mx-auto" alt="">
-                    <div class="card-body">
-                        <h5 class="card-title">{{book.title}}</h5>
-                        {% for poster in book.original_poster.all%}
+                    <a class="overflow" href="{%url 'users:public_profile' poster.ID%}">
+                        {{poster.username}}
+                    </a>
+
+                    {% endfor %}
+                    <a href="{% url 'books:detail-books' book.ID%}">
+                        <img src="{{book.cover.url}}" class="card-img-top img-fluid" alt=""></a>
+                    {% if book.is_free %}
 
 
-                        <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
-                        </a>
+                    <p style="color:#43B14B" class="mt-1 font-weight-bold "> Free </p>
+                    {% else %}
 
-                        {% endfor %}
 
-                        <p class="card-text">Genre : {{book.get_genre_display}} <br> Posted :
-                            {{book.pub_date|date:"SHORT_DATE_FORMAT"}}
-                        </p>
-                        {% if book.is_free %}
-                        <a href="#" style="background:#00c972" class="btn text-light">
+                    <p class="mt-1 font-weight-bold">{{book.price}} €</p>
 
-                            Free </a>
-                        {% else %}
+                    {% endif %}
 
-                        <a href="#" class="btn btn-primary">
+                    <p class=" card-text card-footer text-muted ">Genre : {{book.get_genre_display}}
+                        <br>
+                        Posted :
+                        <span class="card-date">{{book.pub_date|date:"SHORT_DATE_FORMAT"}}</span>
+                    </p>
+                </div>
 
-                            {{book.price}} € </a>
-                        {% endif %}
-                        {% if user in book.original_poster.all or user.is_admin %}
-
-                        {%if book.is_free %}
-
-                        <p><a href=" {%url 'books:update-view' book.ID %} "> update </a></p>
-                        <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                        {%else%}
-
-                        <p><a href=" {%url 'books:update-non-free-view' book.ID %} "> update </a></p>
-                        <p><a href=" {%url 'books:delete-view' book.ID %} "> delete </a></p>
-
-                        {%endif%}
-                        {% endif %}
-                    </div>
-                </a>
             </div>
 
         </div>
 
         {%endfor%}
-
     </div>
-    {%else%}
+</div>
 
 
-    <p style="margin-top:5%" class="alert-info p-2"> Sorry no books matching your query</p>
+
+
+
+
+
+
+
+{% endif %}
+
+
+
+
+<div class="text-center mb-3">
+
+    {% if page_obj.has_previous %}
+
+
+    <a class="text-primary text-decoration-none" href="?page=1">
+        <i class="fas fa-angle-double-left fa-lg "></i>
+
+    </a>
+    <a class="text-primary  text-decoration-none" href="?page= {{ page_obj.previous_page_number}}">
+        <i class="fas fa-angle-left fa-lg"></i>
+    </a>
+
 
     {% endif %}
 
+    {% for num in page_obj.paginator.page_range %}
+
+    {% if page_obj.number == num%}
+
+    <a style="font-size:22px" class="text-primary font-weight-bold mx-1" href="?page={{ num }}">{{ num }}</a>
+
+    {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
 
 
-
-    <div class="text-center mb-3">
-
-        {% if page_obj.has_previous %}
-
-
-        <a class="text-primary text-decoration-none" href="?page=1">
-            <i class="fas fa-angle-double-left fa-lg "></i>
-
-        </a>
-        <a class="text-primary  text-decoration-none" href="?page= {{ page_obj.previous_page_number}}">
-            <i class="fas fa-angle-left fa-lg"></i>
-        </a>
-
-
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-
-        {% if page_obj.number == num%}
-
-        <a style="font-size:22px" class="text-primary font-weight-bold mx-1" href="?page={{ num }}">{{ num }}</a>
-
-        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
-
-
-        <a style=" font-size:22px " class="  text-secondary mx-1" href="?page={{ num }}">{{ num }}</a>
+    <a style=" font-size:22px " class="  text-secondary mx-1" href="?page={{ num }}">{{ num }}</a>
 
 
 
 
-        {% endif %}
+    {% endif %}
 
-        {% endfor %}
+    {% endfor %}
 
-        {% if page_obj.has_next %}
+    {% if page_obj.has_next %}
 
-        <a class=" text-primary  text-decoration-none  " href="?page={{page_obj.next_page_number}}">
-            <i class="fas fa-angle-right fa-lg"></i>
-        </a>
-        <a class=" text-primary text-decoration-none  " href="?page= {{ page_obj.paginator.num_pages}}">
-
-
-            <i class="fas fa-angle-double-right fa-lg"></i>
-
-        </a>
+    <a class=" text-primary  text-decoration-none  " href="?page={{page_obj.next_page_number}}">
+        <i class="fas fa-angle-right fa-lg"></i>
+    </a>
+    <a class=" text-primary text-decoration-none  " href="?page= {{ page_obj.paginator.num_pages}}">
 
 
-        {% endif %}
+        <i class="fas fa-angle-double-right fa-lg"></i>
 
-    </div>
-
-
+    </a>
 
 
-    {% endblock %}
+    {% endif %}
+
+</div>
+
+
+
+
+{% endblock %}

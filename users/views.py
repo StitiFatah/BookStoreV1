@@ -59,7 +59,9 @@ def private_profile(request):
 
     context = {"u_form": u_form,
                "p_form": p_form,
-               "my_books": my_books}
+               "my_books": my_books,
+
+               }
 
     return render(request, "users/private_profile.html", context)
 
@@ -70,7 +72,7 @@ def PublicProfile(request, user_id):
     same_author_books = Books.objects.filter(original_poster=perso_user)
 
     context = {"perso_user": perso_user,
-               "same_author_books": same_author_books
+               "same_author_books": same_author_books,
                }
 
     return render(request, "users/public_profile.html", context)

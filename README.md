@@ -1,7 +1,7 @@
 <h1> Book store </h1>
 
 - Logged users can add and update free and paid ebooks
-- Can buy ebooks using stripe
+- Can buy ebooks using Stripe
 - UI using Bootstrap without existing templates
 
 TODO :

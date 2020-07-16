@@ -27,6 +27,8 @@ urlpatterns = [
     path('index_search/', views.IndexViews_search.as_view(), name="index-search"),
     path('index_specific_search/<str:requested_genre>/', views.IndexViews_specific_search.as_view(),
          name="index-specific-search"),
+    path('index_filtering/<str:filtre>/', views.home_display_books_filtered,
+         name="display-filtered"),
     path("cart/", views.Cart_display_view, name="user-cart"),
     path("add_to_cart/<uuid:book_id>/",
          views.add_item_to_cart, name="add-to-cart"),

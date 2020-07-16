@@ -36,6 +36,20 @@ def home_display_books(request):
     return render(request, "books/first_page.html", context)
 
 
+def home_display_books_filtered(request, filtre):
+    main_list = Books.objects.order_by(
+        filtre).filter(pub_date__lte=timezone.now())
+    paginator = Paginator(main_list, 24)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    side_list = Books.objects.order_by(
+        "-pub_date").filter(pub_date__lte=timezone.now())[:5]
+    context = {"page_obj": page_obj, "side_list": side_list}
+
+    return render(request, "books/first_page.html", context)
+
+
 def search_nav(request, requested_genre):
     filtered_list = Books.objects.filter(
         genre=requested_genre).filter(pub_date__lte=timezone.now())
@@ -43,7 +57,12 @@ def search_nav(request, requested_genre):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    context = {"page_obj": page_obj, "GENRE": requested_genre}
+    context = {"page_obj": page_obj,
+               "GENRE": requested_genre,
+               }
+
+    if filtered_list.exists():
+        context["genre"] = filtered_list[0].get_genre_display
     return render(request, "books/search_nav.html", context)
 
 

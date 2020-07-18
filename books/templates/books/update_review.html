@@ -1,19 +1,19 @@
 {% extends 'book_store/basic.html' %}
-
+{% load crispy_forms_tags %}
 
 
 
 {% block content%}
 
 
-<div style="margin:8%" class="">
+<div class="container my-5">
 
 
     <form action="" method="POST">
 
         {% csrf_token %}
 
-        {{form.as_p}}
+        {{form|crispy}}
 
         <input type="submit" name="" id="">
 

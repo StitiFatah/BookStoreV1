@@ -8,8 +8,8 @@ from django_countries.fields import CountryField
 
 class CreateFreeForm(forms.ModelForm):
 
-    original_poster = forms.ModelMultipleChoiceField(required=True,
-                                                     queryset=PersoUser.objects.all(), widget=forms.CheckboxSelectMultiple)
+    original_poster = forms.ModelMultipleChoiceField(label="co-author", required=False,
+                                                     queryset=PersoUser.objects.all())
 
     class Meta:
 
@@ -21,7 +21,7 @@ class CreateFreeForm(forms.ModelForm):
 class CreateNonFreeForm(forms.ModelForm):
 
     original_poster = forms.ModelMultipleChoiceField(label="co-author",
-                                                     queryset=PersoUser.objects.all(), widget=forms.CheckboxSelectMultiple)
+                                                     queryset=PersoUser.objects.all(), required=False)
     price = forms.DecimalField(
         max_digits=5, decimal_places=2, required=True, validators=[
             MinValueValidator(1)

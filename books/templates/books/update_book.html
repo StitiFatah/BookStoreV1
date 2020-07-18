@@ -1,5 +1,5 @@
 {% extends 'book_store/basic.html' %}
-
+{% load crispy_forms_tags %}
 
 
 
@@ -13,7 +13,7 @@
 
         {% csrf_token %}
 
-        {{form.as_p}}
+        {{form|crispy}}
 
         <input type="submit" name="" id="">
 

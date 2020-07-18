@@ -39,12 +39,19 @@
                         Posted :
                         <span class="card-date">{{book.item.pub_date|date:"SHORT_DATE_FORMAT"}}</span>
                     </p>
+
+
+
+                    <a class="btn btn-outline-primary w-100" href="{{book.item.pdf.url}}" target="blank"> <span
+                            class="">Read</span>
+                    </a>
                     {%if book.item.is_free%}
 
 
-                    <div> <button class="btn btn-outline-danger p-1 rounded">
-                            <a href="#"> <span class="BTNN-danger">delete</span>
-                            </a></button> </div>
+
+                    <a href="{%url 'library:remove-free-from-library' book.item.ID%}"> <span
+                            class="btn btn-outline-danger w-100 mt-1">delete</span>
+                    </a>
 
 
                     {%endif%}

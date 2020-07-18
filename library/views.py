@@ -5,16 +5,16 @@ from .models import FreeLibrary
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
+from itertools import chain
 
 
 @login_required
 def Library(request):
 
-    library = OrderItem.objects.filter(user=request.user, ordered=True)
+    paid_library = OrderItem.objects.filter(user=request.user, ordered=True)
     free_library = FreeLibrary.objects.filter(user=request.user)
-
-    context = {"library": library,
-               "free_library": free_library}
+    library = list(chain(paid_library, free_library))
+    context = {"library": library}
 
     return render(request, "library/main.html", context)
 

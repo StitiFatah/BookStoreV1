@@ -1,117 +1,60 @@
 {% extends "book_store/basic.html" %}
 
-
-
-
-
 {%block content%}
 
+<div class="container mt-3">
+    {% if library %}
+
+    <h2 class="view-header text-center p-2 mb-5"> My Library </h2>
 
 
-
-<div style="margin:5%">
-
-
-    {% if library  %}
-
-
-    <div class="row border border-secondary">
+    <div class="row w-100 ">
 
 
 
         {% for book in library %}
 
+        <div class="col-12 col-sm-6d col-md-4 col-lg-3  py-2">
 
+            <div class="card h-100 text-dark border-0 shadow-lg  ">
 
-        <div class="col-3 ">
-            <div class="card my-2" style="width:180px">
-
-                <img style="width:180px;height:300px" src="{{book.item.cover.url}}" class="mx-auto" alt="">
                 <div class="card-body">
-                    <h5 class="card-title">{{book.item.title}}</h5>
 
+                    <h5 class="card-title overflow text-dark"> {{book.item.title}}</h5>
 
                     {% for poster in book.item.original_poster.all%}
 
 
-                    <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
+                    <a class="overflow" href="{%url 'users:public_profile' poster.ID%}">
+                        {{poster.username}}
                     </a>
 
                     {% endfor %}
 
+                    <img src="{{book.item.cover.url}}" class="card-img-top img-fluid" alt="">
 
 
-
-
-                    <p class=" card-text">Genre : {{book.item.get_genre_display}} <br> Posted :
-                        {{book.item.pub_date|date:"SHORT_DATE_FORMAT"}}
+                    <p class=" card-text card-footer text-muted ">Genre : {{book.get_genre_display}}
+                        <br>
+                        Posted :
+                        <span class="card-date">{{book.item.pub_date|date:"SHORT_DATE_FORMAT"}}</span>
                     </p>
+                    {%if book.item.is_free%}
 
+
+                    <div> <button class="btn btn-outline-danger p-1 rounded">
+                            <a href="#"> <span class="BTNN-danger">delete</span>
+                            </a></button> </div>
+
+
+                    {%endif%}
                 </div>
-                </a>
+
             </div>
 
         </div>
 
         {%endfor%}
-
-
-    </div>
-
-
-
-
-    {%endif%}
-
-    {% if free_library  %}
-
-
-    <div class="row border border-secondary mt-2">
-
-
-
-        {% for book in free_library %}
-
-
-
-        <div class="col-3 ">
-            <div class="card my-2" style="width:180px">
-
-                <img style="width:180px;height:300px" src="{{book.item.cover.url}}" class="mx-auto" alt="">
-                <div class="card-body">
-                    <h5 class="card-title">{{book.item.title}}</h5>
-
-
-                    {% for poster in book.item.original_poster.all%}
-
-
-                    <a href="{%url 'users:public_profile' poster.ID%}"> {{poster.username}}
-                    </a>
-
-                    {% endfor %}
-
-
-
-
-
-                    <p class=" card-text">Genre : {{book.item.get_genre_display}} <br> Posted :
-                        {{book.item.pub_date|date:"SHORT_DATE_FORMAT"}}
-                    </p>
-                    <div> <a href="{% url 'library:remove-free-from-library' book.item.ID%}"> <i
-                                class="fas fa-trash-alt text-danger"></i>
-
-                        </a> </div>
-
-
-                </div>
-                </a>
-            </div>
-
-        </div>
-
-        {%endfor%}
-
-
     </div>
 </div>
 
@@ -120,13 +63,6 @@
 <p> Your library is empty </p>
 
 {%endif%}
-
-</div>
-
-
-
-
-
 
 
 

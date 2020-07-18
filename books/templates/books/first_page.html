@@ -173,20 +173,7 @@
     </form>
 
 
-    <ul class="nav nav-pills nav-fill">
-        <li class="nav-item">
-            <a id="TEST" class="nav-link" href="{% url 'books:display-filtered' 'title'%}  ">Title A-Z</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'books:display-filtered' '-title'%}  ">Title Z-A</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'books:display-filtered' 'price'%}  ">Price Ascending</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'books:display-filtered' '-price'%} ">Price Descending</a>
-        </li>
-    </ul>
+
 
 
 
@@ -204,9 +191,35 @@
 
 
 
+                <div class="w-100">
 
 
-                <h3 class="mx-auto"> All books </h3>
+                    <div style="margin-left:50%" class="mb-3">
+                        <h3> All books </h3>
+                    </div>
+
+
+
+
+
+                    <div class="dropdown ">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Filter By
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{% url 'books:display-filtered' '-title'%}  ">Title Z-A</a>
+                            <a class="dropdown-item" href="{% url 'books:display-filtered' 'price'%}  ">Price
+                                Ascending</a>
+                            <a class="dropdown-item" href="{% url 'books:display-filtered' '-price'%} ">Price
+                                Descending</a>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
                 <div class="row w-100 ">
 
                     {% for book in page_obj %}
